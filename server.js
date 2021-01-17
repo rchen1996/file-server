@@ -12,7 +12,9 @@ const server = net.createServer();
 server.on('connection', (client) => {
   client.setEncoding('utf8');
 
-  client.write('You have joined the file server. To request a file, type file filename.extension')
+  const joinMsgObj = {join: 'You have joined the file server. To request a file, type file filename.extension'}
+  const joinMsg = JSON.stringify(joinMsgObj);
+  client.write(joinMsg);
 
   client.on('data', (data) => {
     console.log(data);
@@ -33,9 +35,13 @@ server.on('connection', (client) => {
     if (param === "file") {
       fs.readFile(`${filePath}`, 'utf8', (error, data) => {
         if (error) {
-          client.write('File does not exist');
+          const errorObj = {error: 'File does not exist'};
+          const errorMsg = JSON.stringify(errorObj);
+          client.write(errorMsg);
         }
-        client.write(data);
+        let textFileObj = { body: data };
+        let textFile = JSON.stringify(textFileObj);
+        client.write(textFile);
       })
     }
   })
